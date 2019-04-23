@@ -56,6 +56,32 @@ class AddExerciseDialog(QtWidgets.QDialog):
         }
 
 
+class LayoutWithTable(QtWidgets.QVBoxLayout):
+
+    def __init__(self, label_text, add_action, table_headers, table_content):
+        super().__init__()
+
+        label = QtWidgets.QLabel(label_text)
+        self.addWidget(label)
+        add_button = QtWidgets.QPushButton('+')
+        self.addWidget(add_button)
+
+        if add_action:
+            add_button.clicked.connect(add_action)
+
+        if table_content:
+            table = QtWidgets.QTableWidget(len(table_content), len(table_headers))
+            table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+            table.setHorizontalHeaderLabels(table_headers)
+            for r, data in enumerate(table_content):
+                for c, header in enumerate(table_headers):
+                    item = data[header]
+                    if header == 'how it felt?':
+                        item = HOW_IT_FELT_EMOTICONS[item]
+                    table.setItem(r, c, QtWidgets.QTableWidgetItem(item))
+            self.addWidget(table)
+
+
 class PracticeLogScreen(QtWidgets.QWidget):
 
     def __init__(self, practice_log_controller: PracticeLogController, parent=None):
@@ -66,8 +92,30 @@ class PracticeLogScreen(QtWidgets.QWidget):
     def init_layouts(self):
         self.layouts = [
             self.init_time_layout(),
-            self.init_exercises_layout(),
-            self.init_songs_layout(),
+            LayoutWithTable(
+                label_text='exercises',
+                add_action=self.add_exercise,
+                table_headers=['name', 'category', 'how it felt?', 'comment'],
+                table_content=self.practice_log_controller.get_exercises(),
+            ),
+            LayoutWithTable(
+                label_text='songs',
+                add_action=self.add_song,
+                table_headers=['artist', 'title', 'how it felt?', 'comment'],
+                table_content=self.practice_log_controller.get_songs(),
+            ),
+            LayoutWithTable(
+                label_text='achievements',
+                add_action=self.add_achievement,
+                table_headers=['name', 'value', 'unit'],
+                table_content=self.practice_log_controller.get_achievements(),
+            ),
+            LayoutWithTable(
+                label_text='light bulb moments',
+                add_action=self.add_light_bulb_moment,
+                table_headers=['effect', 'clue'],
+                table_content=self.practice_log_controller.get_light_bulb_moments(),
+            )
         ]
         full_layout = QtWidgets.QVBoxLayout()
         for i, layout in enumerate(self.layouts):
@@ -85,56 +133,6 @@ class PracticeLogScreen(QtWidgets.QWidget):
 
         return time_layout
 
-    def init_exercises_layout(self):
-        exercises_layout = QtWidgets.QVBoxLayout()
-
-        exercises_label = QtWidgets.QLabel('exercises')
-        exercises_layout.addWidget(exercises_label)
-        add_exercise_button = QtWidgets.QPushButton('+')
-        exercises_layout.addWidget(add_exercise_button)
-
-        add_exercise_button.clicked.connect(self.add_exercise)
-
-        exercises = self.practice_log_controller.get_exercises()
-        if exercises:
-            headers = ['name', 'category', 'how it felt?', 'comment']
-            exercises_table = QtWidgets.QTableWidget(len(exercises), len(headers))
-            exercises_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-            exercises_table.setHorizontalHeaderLabels(headers)
-            for r, exercise in enumerate(exercises):
-                for c, header in enumerate(headers):
-                    item = exercise[header]
-                    if header == 'how it felt?':
-                        item = HOW_IT_FELT_EMOTICONS[item]
-                    exercises_table.setItem(r, c, QtWidgets.QTableWidgetItem(item))
-            exercises_layout.addWidget(exercises_table)
-
-        return exercises_layout
-
-    def init_songs_layout(self):
-        songs_layout = QtWidgets.QVBoxLayout()
-
-        songs_label = QtWidgets.QLabel('songs')
-        songs_layout.addWidget(songs_label)
-        add_exercise_button = QtWidgets.QPushButton('+')
-        songs_layout.addWidget(add_exercise_button)
-
-        songs = self.practice_log_controller.get_songs()
-        if songs:
-            headers = ['artist', 'title', 'how it felt?', 'comment']
-            exercises_table = QtWidgets.QTableWidget(len(songs), len(headers))
-            exercises_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-            exercises_table.setHorizontalHeaderLabels(headers)
-            for r, song in enumerate(songs):
-                for c, header in enumerate(headers):
-                    item = song[header]
-                    if header == 'how it felt?':
-                        item = HOW_IT_FELT_EMOTICONS[item]
-                    exercises_table.setItem(r, c, QtWidgets.QTableWidgetItem(item))
-            songs_layout.addWidget(exercises_table)
-
-        return songs_layout
-
     def add_exercise(self):
         exercise_choices = self.practice_log_controller.get_exercise_choices()
         # TODO: error dialog if no exercises to select from
@@ -145,6 +143,18 @@ class PracticeLogScreen(QtWidgets.QWidget):
             data = dialog.get_data()
             self.practice_log_controller.add_exercise(data=data)
             # TODO: refresh the table to show newly added exercise
+
+    def add_song(self):
+        # TODO
+        pass
+
+    def add_achievement(self):
+        # TODO
+        pass
+
+    def add_light_bulb_moment(self):
+        # TODO
+        pass
 
 
 if __name__ == '__main__':

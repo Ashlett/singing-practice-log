@@ -5,7 +5,7 @@ from database import PracticeSession, Exercise, Exercise2PracticeSession
 
 class PracticeLogController:
 
-    def __init__(self, practice_session_id:int):
+    def __init__(self, practice_session_id: int):
         self.practice_session_id = practice_session_id
 
     @db_session
@@ -47,3 +47,26 @@ class PracticeLogController:
                 'comment': song.comment,
             })
         return songs
+
+    @db_session
+    def get_achievements(self):
+        achievements = []
+        practice_session = PracticeSession[self.practice_session_id]
+        for achievement in practice_session.achievements:
+            achievements.append({
+                'name': achievement.achievement.name,
+                'value': str(achievement.value),
+                'unit': achievement.achievement.unit,
+            })
+        return achievements
+
+    @db_session
+    def get_light_bulb_moments(self):
+        light_bulb_moments = []
+        practice_session = PracticeSession[self.practice_session_id]
+        for lbm in practice_session.light_bulb_moments:
+            light_bulb_moments.append({
+                'effect': lbm.effect,
+                'clue': lbm.clue,
+            })
+        return light_bulb_moments
