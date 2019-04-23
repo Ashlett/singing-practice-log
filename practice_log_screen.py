@@ -1,6 +1,5 @@
 from PySide2 import QtWidgets
 
-from database import Exercise
 from practice_log_controller import PracticeLogController
 
 
@@ -17,17 +16,12 @@ def make_layout_with_label(widget, label_text):
 
 class AddExerciseDialog(QtWidgets.QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, exercise_choices, parent=None):
         super().__init__(parent)
 
         self.exercise = QtWidgets.QComboBox()
-        # TODO: separate DB from UI
-        with db_session:
-            if Exercise.select().count() == 0:
-                # TODO: error dialog if no exercises to select from
-                pass
-            for e in Exercise.select():
-                self.exercise.addItem(str(e), userData=e.id)
+        for e in exercise_choices:
+            self.exercise.addItem(e['label'], userData=e['id'])
 
         self.how_it_felt = QtWidgets.QComboBox()
         for num, face in HOW_IT_FELT_EMOTICONS.items():
@@ -108,12 +102,10 @@ class PracticeLogScreen(QtWidgets.QWidget):
             exercises_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
             exercises_table.setHorizontalHeaderLabels(headers)
             for r, exercise in enumerate(exercises):
-                for c, item in enumerate((
-                    exercise.exercise.name,
-                    exercise.exercise.category.name,
-                    HOW_IT_FELT_EMOTICONS[exercise.how_it_felt],
-                    exercise.comment
-                )):
+                for c, header in enumerate(headers):
+                    item = exercise[header]
+                    if header == 'how it felt?':
+                        item = HOW_IT_FELT_EMOTICONS[item]
                     exercises_table.setItem(r, c, QtWidgets.QTableWidgetItem(item))
             exercises_layout.addWidget(exercises_table)
 
@@ -134,40 +126,33 @@ class PracticeLogScreen(QtWidgets.QWidget):
             exercises_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
             exercises_table.setHorizontalHeaderLabels(headers)
             for r, song in enumerate(songs):
-                for c, item in enumerate((
-                    song.song.artist,
-                    song.song.title,
-                    HOW_IT_FELT_EMOTICONS[song.how_it_felt],
-                    song.comment
-                )):
+                for c, header in enumerate(headers):
+                    item = song[header]
+                    if header == 'how it felt?':
+                        item = HOW_IT_FELT_EMOTICONS[item]
                     exercises_table.setItem(r, c, QtWidgets.QTableWidgetItem(item))
             songs_layout.addWidget(exercises_table)
 
         return songs_layout
 
     def add_exercise(self):
-        dialog = AddExerciseDialog(self)
+        exercise_choices = self.practice_log_controller.get_exercise_choices()
+        # TODO: error dialog if no exercises to select from
+        dialog = AddExerciseDialog(exercise_choices=exercise_choices, parent=self)
         dialog.show()
 
         if dialog.exec_():
             data = dialog.get_data()
-            print(data)
             self.practice_log_controller.add_exercise(data=data)
+            # TODO: refresh the table to show newly added exercise
 
 
 if __name__ == '__main__':
 
     import sys
 
-    from pony.orm import db_session
-
-    from database import PracticeSession
-
-    with db_session():
-        practice_session = PracticeSession.select().first()
-
-        app = QtWidgets.QApplication(sys.argv)
-        window = PracticeLogScreen(practice_log_controller=PracticeLogController(practice_session))
-        window.show()
+    app = QtWidgets.QApplication(sys.argv)
+    window = PracticeLogScreen(practice_log_controller=PracticeLogController(1))
+    window.show()
 
     sys.exit(app.exec_())
