@@ -26,12 +26,18 @@ class Category(db.Entity):
     name = Required(str, unique=True)
     exercises = Set('Exercise')
 
+    def __str__(self):
+        return self.name
+
 
 class Exercise(db.Entity):
 
     name = Required(str, unique=True)
     category = Required('Category')
     practice_sessions = Set('Exercise2PracticeSession')
+
+    def __str__(self):
+        return f'{self.category.name}: {self.name}'
 
 
 class Exercise2PracticeSession(db.Entity):
@@ -48,6 +54,9 @@ class Song(db.Entity):
     title = Required(str)
     composite_key(artist, title)
     practice_sessions = Set('Song2PracticeSession')
+
+    def __str__(self):
+        return f'{self.artist} - {self.title}' if self.artist else self.title
 
 
 class Song2PracticeSession(db.Entity):
