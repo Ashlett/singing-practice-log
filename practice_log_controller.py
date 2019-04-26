@@ -9,6 +9,16 @@ class PracticeLogController:
         self.practice_session_id = practice_session_id
 
     @db_session
+    def get_notes(self):
+        practice_session = PracticeSession[self.practice_session_id]
+        return practice_session.notes
+
+    @db_session
+    def save_notes(self, notes):
+        practice_session = PracticeSession[self.practice_session_id]
+        practice_session.notes = notes
+
+    @db_session
     def get_exercise_choices(self):
         exercise_choices = []
         for e in Exercise.select():

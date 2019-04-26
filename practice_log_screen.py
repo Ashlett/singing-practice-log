@@ -115,7 +115,8 @@ class PracticeLogScreen(QtWidgets.QWidget):
                 add_action=self.add_light_bulb_moment,
                 table_headers=['effect', 'clue'],
                 table_content=self.practice_log_controller.get_light_bulb_moments(),
-            )
+            ),
+            self.init_notes_layout(),
         ]
         full_layout = QtWidgets.QVBoxLayout()
         for i, layout in enumerate(self.layouts):
@@ -132,6 +133,22 @@ class PracticeLogScreen(QtWidgets.QWidget):
         time_layout.addWidget(self.time_picker)
 
         return time_layout
+
+    def init_notes_layout(self):
+        self.notes = QtWidgets.QTextEdit()
+        self.notes.insertPlainText(self.practice_log_controller.get_notes())
+        # TODO: button active only if notes changed?
+        save_notes_button = QtWidgets.QPushButton('Save notes')
+        save_notes_button.clicked.connect(self.save_notes)
+        notes_layout = QtWidgets.QVBoxLayout()
+        notes_layout.addWidget(QtWidgets.QLabel('notes'))
+        notes_layout.addWidget(self.notes)
+        notes_layout.addWidget(save_notes_button)
+        return notes_layout
+
+    def save_notes(self):
+        new_notes = self.notes.toPlainText()
+        self.practice_log_controller.save_notes(new_notes)
 
     def add_exercise(self):
         exercise_choices = self.practice_log_controller.get_exercise_choices()
