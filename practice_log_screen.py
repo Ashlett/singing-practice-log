@@ -124,15 +124,22 @@ class PracticeLogScreen(QtWidgets.QWidget):
         self.setLayout(full_layout)
 
     def init_time_layout(self):
-        time_label = QtWidgets.QLabel('time')
         self.time_picker = QtWidgets.QDateTimeEdit()
+        self.time_picker.setDateTime(self.practice_log_controller.get_start())
         self.time_picker.setCalendarPopup(True)
+        save_start_button = QtWidgets.QPushButton('Save start time')
+        save_start_button.clicked.connect(self.save_start)
 
         time_layout = QtWidgets.QHBoxLayout()
-        time_layout.addWidget(time_label)
+        time_layout.addWidget(QtWidgets.QLabel('start'))
         time_layout.addWidget(self.time_picker)
+        time_layout.addWidget(save_start_button)
 
         return time_layout
+
+    def save_start(self):
+        new_time = self.time_picker.dateTime().toPython()
+        self.practice_log_controller.save_start(start=new_time)
 
     def init_notes_layout(self):
         self.notes = QtWidgets.QTextEdit()
