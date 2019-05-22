@@ -1,6 +1,9 @@
 from PySide2 import QtWidgets
 
-from widgets import AddAchievementDialog, AddExerciseDialog, AddSongDialog, LayoutWithTable
+from widgets import (
+    AddAchievementDialog, AddExerciseDialog, AddLightBulbMomentDialog, AddSongDialog,
+    LayoutWithTable
+)
 from practice_log_controller import PracticeLogController
 
 
@@ -113,8 +116,12 @@ class PracticeLogScreen(QtWidgets.QWidget):
             self.practice_log_controller.add_achievement(**data)
 
     def add_light_bulb_moment(self):
-        # TODO
-        pass
+        dialog = AddLightBulbMomentDialog(self)
+        dialog.show()
+
+        if dialog.exec_():
+            data = dialog.get_data()
+            self.practice_log_controller.add_light_bulb_moment(**data)
 
 
 if __name__ == '__main__':

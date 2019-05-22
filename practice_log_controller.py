@@ -3,7 +3,7 @@ from pony.orm import db_session, select
 # TODO: sort imports
 from database import (
     PracticeSession, Exercise, Exercise2PracticeSession, Song, Song2PracticeSession,
-    Achievement, Achievement2PracticeSession
+    Achievement, Achievement2PracticeSession, LightBulbMoment
 )
 
 
@@ -118,6 +118,10 @@ class PracticeLogController:
                 'clue': lbm.clue,
             })
         return light_bulb_moments
+
+    @db_session
+    def add_light_bulb_moment(self, effect, clue):
+        LightBulbMoment(session=self.practice_session_id, effect=effect, clue=clue)
 
     @db_session
     def _get_choices_for_model(self, model):

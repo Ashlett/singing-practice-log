@@ -121,6 +121,18 @@ class AddAchievementDialog(AddEntityDialog):
         self.init_layout()
 
 
+class AddLightBulbMomentDialog(AddEntityDialog):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.data_widgets = (
+            TextWidget('effect', 'effect'),
+            TextWidget('clue', 'clue'),
+        )
+        self.init_layout()
+
+
 class LayoutWithTable(QtWidgets.QVBoxLayout):
 
     def __init__(self, label_text, add_action, table_headers, table_content):
