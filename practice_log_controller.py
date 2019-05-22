@@ -121,10 +121,4 @@ class PracticeLogController:
 
     @db_session
     def _get_choices_for_model(self, model):
-        choices = []
-        for e in model.select():
-            choices.append({
-                'label': str(e),
-                'id': e.id,
-            })
-        return choices
+        return {item.id: str(item) for item in model.select()}
