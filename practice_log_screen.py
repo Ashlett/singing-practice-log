@@ -107,6 +107,42 @@ class AddSongDialog(QtWidgets.QDialog):
         }
 
 
+class AddAchievementDialog(QtWidgets.QDialog):
+
+    def __init__(self, achievement_choices, parent=None):
+        super().__init__(parent)
+
+        self.achievement = QtWidgets.QComboBox()
+        for e in achievement_choices:
+            self.achievement.addItem(e['label'], userData=e['id'])
+
+        self.value = QtWidgets.QSpinBox()
+
+        widgets_and_labels = (
+            (self.achievement, 'achievement'),
+            (self.value, 'value'),
+        )
+
+        full_layout = QtWidgets.QVBoxLayout()
+        for widget, label in widgets_and_labels:
+            layout = make_layout_with_label(widget=widget, label_text=label)
+            full_layout.addLayout(layout)
+
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+
+        full_layout.addWidget(button_box)
+
+        self.setLayout(full_layout)
+
+    def get_data(self):
+        return {
+            'achievement': self.achievement.currentData(),
+            'value': self.value.value(),
+        }
+
+
 class LayoutWithTable(QtWidgets.QVBoxLayout):
 
     def __init__(self, label_text, add_action, table_headers, table_content):
@@ -233,8 +269,13 @@ class PracticeLogScreen(QtWidgets.QWidget):
             # TODO: refresh the table to show newly added song
 
     def add_achievement(self):
-        # TODO
-        pass
+        achievement_choices = self.practice_log_controller.get_achievement_choices()
+        dialog = AddAchievementDialog(achievement_choices=achievement_choices, parent=self)
+        dialog.show()
+
+        if dialog.exec_():
+            data = dialog.get_data()
+            self.practice_log_controller.add_achievement(**data)
 
     def add_light_bulb_moment(self):
         # TODO

@@ -73,6 +73,9 @@ class Achievement(db.Entity):
     unit = Optional(str)
     practice_sessions = Set('Achievement2PracticeSession')
 
+    def __str__(self):
+        return f'{self.name} ({self.unit})' if self.unit else self.name
+
 
 class Achievement2PracticeSession(db.Entity):
 

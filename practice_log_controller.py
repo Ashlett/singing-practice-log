@@ -1,7 +1,10 @@
 from pony.orm import db_session, select
 
 # TODO: sort imports
-from database import PracticeSession, Exercise, Exercise2PracticeSession, Song, Song2PracticeSession
+from database import (
+    PracticeSession, Exercise, Exercise2PracticeSession, Song, Song2PracticeSession,
+    Achievement, Achievement2PracticeSession
+)
 
 
 class PracticeLogController:
@@ -30,16 +33,6 @@ class PracticeLogController:
         practice_session.start = start
 
     @db_session
-    def get_exercise_choices(self):
-        exercise_choices = []
-        for e in Exercise.select():
-            exercise_choices.append({
-                'label': str(e),
-                'id': e.id,
-            })
-        return exercise_choices
-
-    @db_session
     def get_exercises(self):
         exercises = []
         practice_session = PracticeSession[self.practice_session_id]
@@ -51,6 +44,9 @@ class PracticeLogController:
                 'comment': exercise.comment,
             })
         return exercises
+
+    def get_exercise_choices(self):
+        return self._get_choices_for_model(Exercise)
 
     @db_session
     def add_exercise(self, data):
@@ -101,6 +97,17 @@ class PracticeLogController:
             })
         return achievements
 
+    def get_achievement_choices(self):
+        return self._get_choices_for_model(Achievement)
+
+    @db_session
+    def add_achievement(self, achievement, value):
+        Achievement2PracticeSession(
+            session=self.practice_session_id,
+            achievement=achievement,
+            value=value,
+        )
+
     @db_session
     def get_light_bulb_moments(self):
         light_bulb_moments = []
@@ -111,3 +118,13 @@ class PracticeLogController:
                 'clue': lbm.clue,
             })
         return light_bulb_moments
+
+    @db_session
+    def _get_choices_for_model(self, model):
+        choices = []
+        for e in model.select():
+            choices.append({
+                'label': str(e),
+                'id': e.id,
+            })
+        return choices
