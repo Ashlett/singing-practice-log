@@ -1,4 +1,5 @@
 from PySide2 import QtWidgets
+from PySide2.QtCore import Qt
 
 from practice_log_controller import PracticeLogController
 
@@ -51,6 +52,56 @@ class AddExerciseDialog(QtWidgets.QDialog):
     def get_data(self):
         return {
             'exercise': self.exercise.currentData(),
+            'how_it_felt': self.how_it_felt.currentData(),
+            'comment': self.comment.text(),
+        }
+
+
+class AddSongDialog(QtWidgets.QDialog):
+
+    def __init__(self, artists, titles, parent=None):
+        super().__init__(parent)
+
+        self.artist = QtWidgets.QLineEdit()
+        completer = QtWidgets.QCompleter(artists, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.artist.setCompleter(completer)
+
+        self.title = QtWidgets.QLineEdit()
+        completer = QtWidgets.QCompleter(titles, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.title.setCompleter(completer)
+
+        self.how_it_felt = QtWidgets.QComboBox()
+        for num, face in HOW_IT_FELT_EMOTICONS.items():
+            self.how_it_felt.addItem(face, userData=num)
+
+        self.comment = QtWidgets.QLineEdit()
+
+        widgets_and_labels = (
+            (self.artist, 'artist'),
+            (self.title, 'title'),
+            (self.how_it_felt, 'how it felt?'),
+            (self.comment, 'comment'),
+        )
+
+        full_layout = QtWidgets.QVBoxLayout()
+        for widget, label in widgets_and_labels:
+            layout = make_layout_with_label(widget=widget, label_text=label)
+            full_layout.addLayout(layout)
+
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+
+        full_layout.addWidget(button_box)
+
+        self.setLayout(full_layout)
+
+    def get_data(self):
+        return {
+            'artist': self.artist.text(),
+            'title': self.title.text(),
             'how_it_felt': self.how_it_felt.currentData(),
             'comment': self.comment.text(),
         }
@@ -169,8 +220,17 @@ class PracticeLogScreen(QtWidgets.QWidget):
             # TODO: refresh the table to show newly added exercise
 
     def add_song(self):
-        # TODO
-        pass
+        dialog = AddSongDialog(
+            artists=self.practice_log_controller.get_existing_artists(),
+            titles=self.practice_log_controller.get_existing_titles(),
+            parent=self,
+        )
+        dialog.show()
+
+        if dialog.exec_():
+            data = dialog.get_data()
+            self.practice_log_controller.add_song(**data)
+            # TODO: refresh the table to show newly added song
 
     def add_achievement(self):
         # TODO

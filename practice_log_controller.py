@@ -1,6 +1,7 @@
-from pony.orm import db_session
+from pony.orm import db_session, select
 
-from database import PracticeSession, Exercise, Exercise2PracticeSession
+# TODO: sort imports
+from database import PracticeSession, Exercise, Exercise2PracticeSession, Song, Song2PracticeSession
 
 
 class PracticeLogController:
@@ -67,6 +68,26 @@ class PracticeLogController:
                 'comment': song.comment,
             })
         return songs
+
+    @db_session
+    def get_existing_artists(self):
+        return list(select(s.artist for s in Song))
+
+    @db_session
+    def get_existing_titles(self):
+        return list(select(s.title for s in Song))
+
+    @db_session
+    def add_song(self, artist, title, how_it_felt, comment):
+        song = Song.get(artist=artist, title=title)
+        if not song:
+            song = Song(artist=artist, title=title)
+        Song2PracticeSession(
+            session=self.practice_session_id,
+            song=song,
+            how_it_felt=how_it_felt,
+            comment=comment,
+        )
 
     @db_session
     def get_achievements(self):
