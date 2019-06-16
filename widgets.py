@@ -84,6 +84,18 @@ class AddEntityDialog(QtWidgets.QDialog):
 
 class AddExerciseDialog(AddEntityDialog):
 
+    def __init__(self, categories, parent=None):
+        super().__init__(parent)
+
+        self.data_widgets = (
+            TextWidgetWithAutocomplete('category', 'category_name', word_list=categories),
+            TextWidget('name', 'name'),
+        )
+        self.init_layout()
+
+
+class AddExerciseToSessionDialog(AddEntityDialog):
+
     def __init__(self, exercise_choices, parent=None):
         super().__init__(parent)
 
@@ -95,7 +107,7 @@ class AddExerciseDialog(AddEntityDialog):
         self.init_layout()
 
 
-class AddSongDialog(AddEntityDialog):
+class AddSongToSessionDialog(AddEntityDialog):
 
     def __init__(self, artists, titles, parent=None):
         super().__init__(parent)
@@ -109,7 +121,7 @@ class AddSongDialog(AddEntityDialog):
         self.init_layout()
 
 
-class AddAchievementDialog(AddEntityDialog):
+class AddAchievementToSessionDialog(AddEntityDialog):
 
     def __init__(self, achievement_choices, parent=None):
         super().__init__(parent)

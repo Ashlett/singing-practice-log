@@ -1,7 +1,7 @@
 from PySide2 import QtWidgets
 
 from widgets import (
-    AddAchievementDialog, AddExerciseDialog, AddLightBulbMomentDialog, AddSongDialog,
+    AddAchievementToSessionDialog, AddExerciseToSessionDialog, AddLightBulbMomentDialog, AddSongToSessionDialog,
     LayoutWithTable
 )
 from practice_log_controller import PracticeLogController
@@ -85,7 +85,7 @@ class PracticeLogScreen(QtWidgets.QWidget):
     def add_exercise(self):
         exercise_choices = self.practice_log_controller.get_exercise_choices()
         # TODO: error dialog if no exercises to select from
-        dialog = AddExerciseDialog(exercise_choices=exercise_choices, parent=self)
+        dialog = AddExerciseToSessionDialog(exercise_choices=exercise_choices, parent=self)
         dialog.show()
 
         if dialog.exec_():
@@ -94,7 +94,7 @@ class PracticeLogScreen(QtWidgets.QWidget):
             # TODO: refresh the table to show newly added exercise
 
     def add_song(self):
-        dialog = AddSongDialog(
+        dialog = AddSongToSessionDialog(
             artists=self.practice_log_controller.get_existing_artists(),
             titles=self.practice_log_controller.get_existing_titles(),
             parent=self,
@@ -108,7 +108,7 @@ class PracticeLogScreen(QtWidgets.QWidget):
 
     def add_achievement(self):
         achievement_choices = self.practice_log_controller.get_achievement_choices()
-        dialog = AddAchievementDialog(achievement_choices=achievement_choices, parent=self)
+        dialog = AddAchievementToSessionDialog(achievement_choices=achievement_choices, parent=self)
         dialog.show()
 
         if dialog.exec_():
