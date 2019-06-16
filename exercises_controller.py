@@ -14,6 +14,7 @@ class ExercisesController:
             else:
                 last_done = ''
             exercises.append({
+                'id': e.id,
                 'category': str(e.category),
                 'name': e.name,
                 'last done': last_done,
@@ -31,3 +32,22 @@ class ExercisesController:
         if not category:
             category = Category(name=category_name)
         Exercise(category=category, name=name)
+
+    @db_session
+    def get_exercise_string(self, exercise_id):
+        exercise = Exercise[exercise_id]
+        return str(exercise)
+
+    @db_session
+    def get_sessions_for_exercise(self, exercise_id):
+        exercise = Exercise[exercise_id]
+        practice_sessions = []
+        for ps in exercise.practice_sessions:
+            practice_sessions.append({
+                'id': ps.session.id,
+                'date': ps.session.start.strftime('%Y-%m-%d %H:%M'),
+                'how it felt?': ps.how_it_felt,
+                'comment': ps.comment,
+            })
+        practice_sessions.sort(key=lambda x: x['date'], reverse=True)
+        return practice_sessions

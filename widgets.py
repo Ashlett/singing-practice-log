@@ -147,15 +147,17 @@ class AddLightBulbMomentDialog(AddEntityDialog):
 
 class LayoutWithTable(QtWidgets.QVBoxLayout):
 
-    def __init__(self, label_text, add_action, table_headers, table_content):
+    def __init__(self, label_text, add_action, table_headers, table_content, row_action=None):
         super().__init__()
+        self.rows_to_ids = {}
+        self.row_action = row_action
 
         label = QtWidgets.QLabel(label_text)
         self.addWidget(label)
-        add_button = QtWidgets.QPushButton('+')
-        self.addWidget(add_button)
 
         if add_action:
+            add_button = QtWidgets.QPushButton('+')
+            self.addWidget(add_button)
             add_button.clicked.connect(add_action)
 
         if table_content:
@@ -163,9 +165,17 @@ class LayoutWithTable(QtWidgets.QVBoxLayout):
             table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
             table.setHorizontalHeaderLabels(table_headers)
             for r, data in enumerate(table_content):
+                if row_action:
+                    self.rows_to_ids[r] = data['id']
                 for c, header in enumerate(table_headers):
                     item = data[header]
                     if header == 'how it felt?':
                         item = HOW_IT_FELT_EMOTICONS[item]
                     table.setItem(r, c, QtWidgets.QTableWidgetItem(item))
+            if row_action:
+                table.cellDoubleClicked.connect(self.cell_double_clicked)
             self.addWidget(table)
+
+    def cell_double_clicked(self, row, column):
+        action_id = self.rows_to_ids[row]
+        self.row_action(action_id)

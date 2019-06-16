@@ -7,10 +7,10 @@ from widgets import (
 from practice_log_controller import PracticeLogController
 
 
-class PracticeLogScreen(QtWidgets.QWidget):
+class PracticeLogScreen(QtWidgets.QDialog):
 
     def __init__(self, practice_log_controller: PracticeLogController, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
+        QtWidgets.QDialog.__init__(self, parent)
         self.practice_log_controller = practice_log_controller
         self.init_layouts()
 
