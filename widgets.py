@@ -179,3 +179,29 @@ class LayoutWithTable(QtWidgets.QVBoxLayout):
     def cell_double_clicked(self, row, column):
         action_id = self.rows_to_ids[row]
         self.row_action(action_id)
+
+
+class SingleItemScreen(QtWidgets.QDialog):
+
+    def __init__(self, item_name, sessions_for_item, parent=None):
+        QtWidgets.QDialog.__init__(self, parent)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
+        self.table = LayoutWithTable(
+            label_text=item_name,
+            add_action=None,
+            table_headers=['date', 'how it felt?', 'comment'],
+            table_content=sessions_for_item,
+            row_action=self.show_practice_log_screen,
+        )
+        self.setLayout(self.table)
+
+    def show_practice_log_screen(self, practice_session_id):
+        from practice_log_controller import PracticeLogController
+        from practice_log_screen import PracticeLogScreen
+
+        screen = PracticeLogScreen(
+            practice_log_controller=PracticeLogController(practice_session_id),
+            parent=self,
+        )
+        screen.show()

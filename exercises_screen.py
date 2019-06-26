@@ -1,32 +1,7 @@
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtWidgets
 
 from exercises_controller import ExercisesController
-from practice_log_controller import PracticeLogController
-from practice_log_screen import PracticeLogScreen
-from widgets import AddExerciseDialog, LayoutWithTable
-
-
-class SingleExerciseScreen(QtWidgets.QDialog):
-
-    def __init__(self, exercise_name, sessions_for_exercise, parent=None):
-        QtWidgets.QDialog.__init__(self, parent)
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        self.table = LayoutWithTable(
-            label_text=exercise_name,
-            add_action=None,
-            table_headers=['date', 'how it felt?', 'comment'],
-            table_content=sessions_for_exercise,
-            row_action=self.show_practice_log_screen,
-        )
-        self.setLayout(self.table)
-
-    def show_practice_log_screen(self, practice_session_id):
-        screen = PracticeLogScreen(
-            practice_log_controller=PracticeLogController(practice_session_id),
-            parent=self,
-        )
-        screen.show()
+from widgets import AddExerciseDialog, LayoutWithTable, SingleItemScreen
 
 
 class ExercisesListScreen(QtWidgets.QWidget):
@@ -57,9 +32,9 @@ class ExercisesListScreen(QtWidgets.QWidget):
             # TODO: refresh the table to show newly added exercise
 
     def show_single_exercise_screen(self, exercise_id):
-        screen = SingleExerciseScreen(
-            exercise_name=self.exercises_controller.get_item_string(exercise_id),
-            sessions_for_exercise=self.exercises_controller.get_sessions_for_item(exercise_id),
+        screen = SingleItemScreen(
+            item_name=self.exercises_controller.get_item_string(exercise_id),
+            sessions_for_item=self.exercises_controller.get_sessions_for_item(exercise_id),
             parent=self,
         )
         screen.show()
