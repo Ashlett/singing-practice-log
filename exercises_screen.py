@@ -40,7 +40,7 @@ class ExercisesListScreen(QtWidgets.QWidget):
             label_text='exercises',
             add_action=self.add_exercise,
             table_headers=['category', 'name', 'last done', 'times done'],
-            table_content=self.exercises_controller.get_exercises(),
+            table_content=self.exercises_controller.get_all_items(),
             row_action=self.show_single_exercise_screen,
         )
         # TODO: filters/sorting in table
@@ -58,8 +58,8 @@ class ExercisesListScreen(QtWidgets.QWidget):
 
     def show_single_exercise_screen(self, exercise_id):
         screen = SingleExerciseScreen(
-            exercise_name=self.exercises_controller.get_exercise_string(exercise_id),
-            sessions_for_exercise=self.exercises_controller.get_sessions_for_exercise(exercise_id),
+            exercise_name=self.exercises_controller.get_item_string(exercise_id),
+            sessions_for_exercise=self.exercises_controller.get_sessions_for_item(exercise_id),
             parent=self,
         )
         screen.show()
