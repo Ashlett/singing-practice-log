@@ -147,7 +147,7 @@ class AddLightBulbMomentDialog(AddEntityDialog):
 
 class LayoutWithTable(QtWidgets.QVBoxLayout):
 
-    def __init__(self, label_text, add_action, table_headers, table_content, row_action=None):
+    def __init__(self, label_text, table_headers, table_content, add_action=None, row_action=None):
         super().__init__()
         self.rows_to_ids = {}
         self.row_action = row_action
