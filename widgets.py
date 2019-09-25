@@ -1,5 +1,6 @@
 from PySide2 import QtWidgets
-from PySide2.QtCore import Qt
+from PySide2.QtCharts import QtCharts
+from PySide2.QtCore import Qt, QDateTime
 
 
 HOW_IT_FELT_EMOTICONS = {None: '', 3: '😃', 2: '😐', 1: '😞'}
@@ -90,6 +91,18 @@ class AddExerciseDialog(AddEntityDialog):
         self.data_widgets = (
             TextWidgetWithAutocomplete('category', 'category_name', word_list=categories),
             TextWidget('name', 'name'),
+        )
+        self.init_layout()
+
+
+class AddAchievementDialog(AddEntityDialog):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.data_widgets = (
+            TextWidget('name', 'name'),
+            TextWidget('unit', 'unit'),
         )
         self.init_layout()
 
@@ -195,6 +208,76 @@ class SingleItemScreen(QtWidgets.QDialog):
             row_action=self.show_practice_log_screen,
         )
         self.setLayout(self.table)
+
+    def show_practice_log_screen(self, practice_session_id):
+        from practice_log_controller import PracticeLogController
+        from practice_log_screen import PracticeLogScreen
+
+        screen = PracticeLogScreen(
+            practice_log_controller=PracticeLogController(practice_session_id),
+            parent=self,
+        )
+        screen.show()
+
+
+class SingleAchievementScreen(QtWidgets.QDialog):
+
+    def __init__(self, item_name, sessions_for_item, parent=None):
+        QtWidgets.QDialog.__init__(self, parent)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
+        self.table = LayoutWithTable(
+            label_text=item_name,
+            add_action=None,
+            table_headers=['date', 'value'],
+            table_content=sessions_for_item,
+            row_action=self.show_practice_log_screen,
+        )
+
+        # Creating QChart
+        self.chart = QtCharts.QChart()
+        self.chart.setAnimationOptions(QtCharts.QChart.AllAnimations)
+
+        series = QtCharts.QScatterSeries()
+        for row in sessions_for_item:
+            date = QDateTime().fromString(row['date'], 'yyyy-MM-dd HH:mm').toMSecsSinceEpoch()
+            value = int(row['value'])
+            series.append(date, value)
+
+        self.chart.addSeries(series)
+
+        # Creating QChartView
+        self.chart_view = QtCharts.QChartView(self.chart)
+        # self.chart_view.setRenderHint(QPainter.Antialiasing)
+        # Setting X-axis
+        self.axis_x = QtCharts.QDateTimeAxis()
+        # self.axis_x.setTickCount(10)
+        # self.axis_x.setFormat('yyyy-MM-dd HH:mm')
+        self.axis_x.setTitleText("Date")
+        self.chart.addAxis(self.axis_x, Qt.AlignBottom)
+        series.attachAxis(self.axis_x)
+        # Setting Y-axis
+        self.axis_y = QtCharts.QValueAxis()
+        # self.axis_y.setTickCount(10)
+        self.axis_y.setTickInterval(1.0)
+        # self.axis_y.setLabelFormat("%d")
+        self.axis_y.setTitleText("Magnitude")
+        self.chart.addAxis(self.axis_y, Qt.AlignLeft)
+        series.attachAxis(self.axis_y)
+        # QWidget Layout
+        self.main_layout = QtWidgets.QHBoxLayout()
+        size = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+
+        ## Left layout
+        self.main_layout.addLayout(self.table)
+
+        ## Right Layout
+        size.setHorizontalStretch(4)
+        self.chart_view.setSizePolicy(size)
+        self.main_layout.addWidget(self.chart_view)
+
+        # Set the layout to the QWidget
+        self.setLayout(self.main_layout)
 
     def show_practice_log_screen(self, practice_session_id):
         from practice_log_controller import PracticeLogController

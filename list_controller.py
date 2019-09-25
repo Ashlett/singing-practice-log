@@ -35,11 +35,17 @@ class ListController:
         item = self.entity[item_id]
         practice_sessions = []
         for ps in item.practice_sessions:
-            practice_sessions.append({
+            data = {
                 'id': ps.session.id,
                 'date': ps.session.start.strftime('%Y-%m-%d %H:%M'),
-                'how it felt?': ps.how_it_felt,
-                'comment': ps.comment,
-            })
+            }
+            data.update(self.get_extra_keys_for_session(ps))
+            practice_sessions.append(data)
         practice_sessions.sort(key=lambda x: x['date'], reverse=True)
         return practice_sessions
+
+    def get_extra_keys_for_session(self, ps):
+        return {
+            'how it felt?': ps.how_it_felt,
+            'comment': ps.comment,
+        }
